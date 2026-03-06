@@ -1,71 +1,71 @@
-# Payroll liquidation shown as **Annulled** after substitution patronal
+# Liquidación anulada en casos de sustitución patronal
 
-## Problem
+## Problema
 
-Customer sees a payroll liquidation for an employee involved in a **sustitución patronal** (employer substitution) showing status **“Anulada”** instead of the expected **“Aprobada”**.
+El cliente ve una **liquidación de nómina** para una persona involucrada en una **sustitución patronal** que aparece con estado **"Anulada"** en lugar del estado **"Aprobada"** que esperaban.
 
-Example: Employee *Sheyla* at customer *Navinter*; liquidation appears as annulled after substitution patronal.
+Ejemplo: colaboradora *Sheyla* en el cliente *Navinter*; la liquidación aparece como anulada luego de la sustitución patronal.
 
-## Context
+## Contexto
 
-- Module: Payroll / Liquidaciones.
-- Scenario: **Sustitución patronal** between two employers (old and new).
-- Current product limitation: the system does **not yet fully support** a dedicated liquidation flow/state for substitution patronal cases.
+- Módulo: Nómina / Liquidaciones.
+- Escenario: **Sustitución patronal** entre dos patronos (anterior y nuevo).
+- Limitación actual del producto: el sistema **todavía no soporta completamente** un flujo/estado específico de liquidación para casos de sustitución patronal.
 
-## Symptoms
+## Síntomas
 
-- Liquidation generated as part of the substitution patronal process.
-- Status displayed: **Anulada**.
-- Customer expectation (based on prior communication): liquidation should remain in **Aprobada** state.
+- Se genera una liquidación como parte del proceso de sustitución patronal.
+- En la UI el estado se muestra como **"Anulada"**.
+- El cliente, según indicaciones previas, esperaba que la liquidación quedara en estado **"Aprobada"** o similar.
 
-## Root cause / Design decision (current behavior)
+## Causa raíz / Decisión de diseño (comportamiento actual)
 
-- The system still lacks full support for a specific **substitution patronal liquidation** type/state.
-- To avoid these liquidations impacting payroll calculations either in the **previous employer** or the **new employer**, the current workaround is:
-  - The liquidation is left in **Anulada** status.
-  - The calculation details and reports remain **consultable**.
-  - The liquidation **does not affect future calculations** in either employer.
+- Aún no existe en el sistema un tipo/estado de liquidación específico para **sustitución patronal**.
+- Para evitar que estas liquidaciones afecten cálculos de nómina tanto en el **patrono anterior** como en el **patrono nuevo**, se tomó la siguiente decisión temporal:
+  - La liquidación se deja con estado **"Anulada"** de forma intencional.
+  - Los detalles de cálculo y la reportería quedan **disponibles para consulta**.
+  - La liquidación **no impacta cálculos futuros** en ninguno de los dos patronos.
 
-This is a **temporary design** until native support for substitution patronal liquidations is implemented.
+Este es un **diseño temporal** hasta que exista soporte nativo para liquidaciones de sustitución patronal.
 
-## Resolution (how to handle the ticket)
+## Resolución (cómo manejar el ticket)
 
-1. **Confirm the scenario**
-   - Validate that the employee’s movement is indeed a **sustitución patronal**.
-   - Confirm that the liquidation in question belongs to that movement.
+1. **Confirmar el escenario**
+   - Verificar que el movimiento de la persona sea efectivamente una **sustitución patronal**.
+   - Confirmar que la liquidación consultada está asociada a ese movimiento.
 
-2. **Explain the current system limitation**
-   - The product does not yet have a dedicated liquidation type/state for substitution patronal.
-   - As an interim solution, these liquidations are marked as **Anulada** intentionally.
+2. **Explicar la limitación actual del sistema**
+   - Indicar que el producto todavía no cuenta con un tipo/estado de liquidación específico para sustitución patronal.
+   - Aclarar que, como solución temporal, estas liquidaciones se marcan como **"Anulada"** de forma deliberada.
 
-3. **Clarify impact to the customer**
-   - Although the status shows as **Anulada**, the liquidation:
-     - Sigue disponible para **consulta** de reportería y revisión de cálculos.
+3. **Aclarar el impacto para el cliente**
+   - Aunque el estado muestre **"Anulada"**, la liquidación:
+     - Sigue disponible para **consulta de reportes** y revisión de cálculos históricos.
      - **No afecta** cálculos futuros de nómina ni en el patrono anterior ni en el nuevo.
 
-4. **Set expectations about future behavior**
-   - Indicate that once the system includes full support for substitution patronal liquidations:
-     - These cases will move to a specific **“sustitución patronal”** state (or equivalent).
-     - They will stop appearing as annulled while keeping the intended behavior of not impacting future calculations.
-   - The customer will be notified when this enhancement is deployed.
+4. **Definir expectativas sobre el comportamiento futuro**
+   - Indicar que, cuando el sistema incluya soporte completo para liquidaciones de sustitución patronal:
+     - Estos casos pasarán a un estado específico de **"sustitución patronal"** (o equivalente).
+     - Dejarán de aparecer como anuladas, manteniendo el mismo objetivo de no impactar cálculos futuros.
+   - Aclarar que se notificará al cliente cuando esta mejora sea desplegada.
 
-## Suggested L1 response (template)
+## Respuesta sugerida para L1 (plantilla)
 
 > Buenos días, [nombre].
 >
-> En el caso de Sheyla, al tratarse de una **sustitución patronal**, la liquidación aparece actualmente como **“Anulada”** de forma intencional. Esto se debe a que, por ahora, el sistema todavía no cuenta con un tipo de liquidación específico para sustitución patronal.
+> En el caso de Sheyla, al tratarse de una **sustitución patronal**, la liquidación aparece actualmente como **"Anulada"** de forma intencional. Esto se debe a que, por ahora, el sistema todavía no cuenta con un tipo de liquidación específico para sustitución patronal.
 >
-> Para evitar que esa liquidación afecte cálculos en el patrono anterior o en el nuevo, se deja en estado **Anulada**, pero **sigue disponible para consulta** de reportes y de los cálculos que se realizaron en su momento. Lo importante es que no impacta ningún cálculo futuro de nómina.
+> Para evitar que esa liquidación afecte cálculos en el patrono anterior o en el nuevo, se deja en estado **"Anulada"**, pero **sigue disponible para consulta** de reportes y de los cálculos que se realizaron en su momento. Lo importante es que no impacta ningún cálculo futuro de nómina.
 >
-> Tenemos planificada la mejora para soportar este tipo de movimientos de forma nativa. Cuando esté disponible, estas liquidaciones dejarán de verse como “Anulada” y pasarán a un estado específico de **sustitución patronal**, sin afectar el funcionamiento del sistema. En ese momento les avisaremos.
+> Tenemos planificada la mejora para soportar este tipo de movimientos de forma nativa. Cuando esté disponible, estas liquidaciones dejarán de verse como "Anulada" y pasarán a un estado específico de **sustitución patronal**, sin afectar el funcionamiento del sistema. En ese momento les avisaremos.
 >
 > Quedamos atentos si necesitan que revisemos algún caso adicional o detalle específico de la liquidación.
 
-## Prevention / Notes
+## Prevención / Notas
 
-- Until the dedicated substitution patronal liquidation feature is released:
-  - This “Annulled but consultable” behavior is **expected** for substitution cases.
-  - L1 should **not** attempt to "re-approve" these liquidations manually.
-- Once the feature is available, this runbook should be **updated** to:
-  - Describe the new status/behavior.
-  - Include any migration notes (e.g., historical cases auto-mapped from "Anulada" to the new state).
+- Mientras no se libere la funcionalidad específica de liquidación por sustitución patronal:
+  - Este comportamiento de **"anulada pero consultable"** es **esperado** para estos casos.
+  - L1 **no debe** intentar "re-aprobar" manualmente estas liquidaciones.
+- Una vez que la funcionalidad esté disponible, este runbook debe **actualizarse** para:
+  - Describir el nuevo estado/comportamiento.
+  - Incluir notas de migración (por ejemplo, casos históricos que pasen automáticamente de "Anulada" al nuevo estado).

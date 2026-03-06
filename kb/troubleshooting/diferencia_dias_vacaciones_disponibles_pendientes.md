@@ -1,93 +1,93 @@
-# Difference between "Días disponibles" and "Días pendientes" in vacation widgets
+# Diferencia entre "Días disponibles" y "Días pendientes" en los widgets de vacaciones
 
-## Problem
+## Problema
 
-In the employee profile there are two vacation-related widgets that can show different values, which confuses employees:
+En el perfil del colaborador existen dos widgets relacionados a vacaciones que pueden mostrar valores distintos, lo cual genera confusión:
 
-- Left panel: **"Vacaciones" → DÍAS DISPONIBLES** (e.g. 21.6)
-- Right panel: **"Resumen Anual de Vacaciones" → DÍAS PENDIENTES (total)** (e.g. 22.6)
+- Panel izquierdo: **"Vacaciones" → DÍAS DISPONIBLES** (ejemplo: 21.6)
+- Panel derecho: **"Resumen Anual de Vacaciones" → DÍAS PENDIENTES (total)** (ejemplo: 22.6)
 
-Customer question: _"Why is there a difference between the two vacation options available in the profile? It causes confusion to staff."_
+Pregunta del cliente: _"¿Por qué hay diferencia entre las dos opciones de vacaciones disponibles en el perfil? Esto causa duda en el personal."_
 
-## Conceptual model
+## Modelo conceptual
 
-There are two core data streams:
+Hay dos flujos de datos principales:
 
-1. **Credits (días acreditados)**
-   - Based on the employee's **vacation license/policy**.
-   - The system accrues days **daily** according to that license.
-   - Over time this produces total **credited days** since the employee's start date (alta).
+1. **Créditos (días acreditados)**
+   - Derivan de la **licencia/política de vacaciones** asignada al colaborador.
+   - El sistema acredita días **diariamente** según esa licencia.
+   - Con el tiempo se obtiene el total de **días acreditados** desde la fecha de alta del colaborador.
 
-2. **Permissions / vacation requests (permisos)**
-   - Vacations are treated as a specific type of **permission** linked to the vacation license.
-   - Each request covers one or more dates; the system converts this into a **number of days taken**.
-   - These days taken are **subtracted** from the credited balance.
+2. **Permisos / solicitudes de vacaciones**
+   - Las vacaciones se registran como un tipo específico de **permiso** vinculado a la licencia de vacaciones.
+   - Cada solicitud cubre uno o más días; el sistema la traduce a una **cantidad de días gozados**.
+   - Esos días gozados se **restan** del saldo acreditado.
 
-Conceptually the balance should be:
+En concepto, el saldo debería ser:
 
-> **Available / Pending = Total credited days − Total days taken (permissions)**
+> **Saldo (disponible/pendiente) = Días acreditados totales − Días gozados (permisos)**
 
-## Intended meaning of each widget
+## Significado previsto de cada widget
 
-- **DÍAS DISPONIBLES (left panel)**
-  - Intent: show the **current usable balance** for the employee.
-  - Should consider:
-    - Days credited from the license.
-    - Vacation permissions that are valid for the employee **after their hire date (fecha de alta)**.
+- **DÍAS DISPONIBLES (panel izquierdo)**
+  - Objetivo: mostrar el **saldo actualmente utilizable** por el colaborador.
+  - Debe considerar:
+    - Días acreditados por la licencia.
+    - Permisos de vacaciones válidos **posteriores a la fecha de alta** del colaborador.
 
-- **DÍAS PENDIENTES (consolidated in annual summary)**
-  - Intent: show the **total pending days by period** (year, policy period, etc.).
-  - Also derived from credited days minus days taken, but based on the **period aggregation**.
+- **DÍAS PENDIENTES (consolidado en el resumen anual)**
+  - Objetivo: mostrar el **total de días pendientes por periodo** (año, periodo de política, etc.).
+  - También se calcula a partir de días acreditados menos días gozados, pero con una **agrupación por periodos**.
 
-## Specific bug observed in this case
+## Bug específico observado en este caso
 
-In the Navinter case (screenshot provided), investigation showed:
+En el caso de Navinter (captura proporcionada), el análisis mostró:
 
-- Credits (días acreditados) were **correct**.
-- Some vacation permissions (permisos) had a **date earlier than the employee's hire date (fecha de alta)**.
-- One part of the system **correctly filtered** permissions to only count those **after the hire date**.
-- Another part **did not apply** this filter and was including a permission dated **before** the hire date.
+- Los créditos (días acreditados) estaban **correctos**.
+- Existían permisos de vacaciones con **fecha anterior a la fecha de alta** del colaborador.
+- Una parte del sistema **sí filtraba** los permisos para contar solo los posteriores a la fecha de alta.
+- Otra parte **no aplicaba** ese filtro e incluía un permiso con fecha **previa al alta**.
 
-Result:
+Resultado:
 
-- One widget (e.g. DÍAS DISPONIBLES) used the filtered count → **lower days taken** → slightly **higher available**.
-- The other widget (DÍAS PENDIENTES in the annual summary) included the pre-hire permission → **higher days taken** → different balance.
+- Un widget (por ejemplo, DÍAS DISPONIBLES) usaba el conteo filtrado → **menos días gozados** → saldo **ligeramente mayor**.
+- El otro widget (DÍAS PENDIENTES del resumen anual) incluía el permiso previo al alta → **más días gozados** → saldo diferente.
 
-This created a discrepancy (e.g. 21.6 vs 22.6) and confusion for employees.
+Esto generaba una discrepancia (por ejemplo, 21.6 vs 22.6) y confusión en los colaboradores.
 
-## Resolution steps (for support/technical)
+## Pasos de resolución (para soporte/técnico)
 
-1. **Confirm the employee and periods**
-   - Identify the employee and the periods where the discrepancy appears.
+1. **Confirmar colaborador y periodos**
+   - Identificar al colaborador afectado y los periodos donde se observa la discrepancia.
 
-2. **Review credits**
-   - Check **días acreditados** generated from the vacation license.
-   - Confirm they match the license configuration and hire date.
+2. **Revisar créditos**
+   - Verificar los **días acreditados** según la licencia de vacaciones.
+   - Confirmar que concuerdan con la configuración de la licencia y la fecha de alta.
 
-3. **Review permissions (vacation requests)**
-   - List all vacation-type permissions for the employee.
-   - Pay special attention to:
-     - Dates **relative to the hire date (fecha de alta)**.
-     - Any permissions accidentally recorded **before the hire date**.
+3. **Revisar permisos (vacaciones)**
+   - Listar todos los permisos de tipo vacaciones para el colaborador.
+   - Poner especial atención en:
+     - Fechas **relativas a la fecha de alta** del colaborador.
+     - Cualquier permiso registrado **antes de la fecha de alta**.
 
-4. **Correct invalid permissions**
-   - If permissions exist with dates earlier than the hire date:
-     - Adjust/migrate those permissions to valid dates.
-     - Or, if they are erroneous, remove/cancel them according to policy.
+4. **Corregir permisos inválidos**
+   - Si existen permisos con fecha anterior a la fecha de alta:
+     - Ajustar/migrar esas fechas a un rango válido.
+     - O, si fueron errores de registro, anular/eliminar según la política del cliente.
 
-5. **Recalculate / refresh views**
-   - Ensure both widgets use the same filtering rules (post-hire permissions only).
-   - If the product currently filters only on one side, log a bug/technical task to align both calculations.
+5. **Recalcular / refrescar vistas**
+   - Verificar que ambos widgets usen la misma regla de filtrado de permisos (solo posteriores a la fecha de alta).
+   - Si actualmente solo uno aplica el filtro, registrar un bug/tarea técnica para alinear ambos cálculos.
 
-6. **Validate**
-   - Compare **DÍAS DISPONIBLES** vs consolidated **DÍAS PENDIENTES** again.
-   - They should now be consistent (apart from any known intentional differences such as rounding or future-dated approved requests, if applicable).
+6. **Validar resultado**
+   - Comparar nuevamente **DÍAS DISPONIBLES** vs **DÍAS PENDIENTES** consolidados.
+   - Deben ser consistentes (salvo diferencias esperadas como redondeos o solicitudes futuras ya aprobadas, si aplica).
 
-## Suggested L1 explanation to customer (while bug exists)
+## Explicación sugerida para L1 al cliente (mientras el bug exista)
 
 > En el perfil se muestran dos vistas de vacaciones:
 > 
-> - **Días disponibles**: el saldo que la persona puede usar hoy, calculado en base a los días acreditados por su licencia y los permisos de vacaciones que ha tomado.
+> - **Días disponibles**: el saldo que la persona puede usar hoy, calculado en base a los días que se le han acreditado por su licencia de vacaciones menos los permisos que ya ha gozado.
 > - **Días pendientes (Resumen Anual)**: el saldo por periodo, usando la misma lógica de créditos menos días gozados.
 > 
 > En su caso encontramos que había uno o más permisos de vacaciones registrados con fecha **anterior a la fecha de alta** de la persona. En una parte del sistema esos permisos se filtraban correctamente (solo se contaban permisos posteriores al alta), pero en otra vista no se estaba aplicando ese filtro, lo que generaba la diferencia entre los dos saldos.
@@ -96,10 +96,10 @@ This created a discrepancy (e.g. 21.6 vs 22.6) and confusion for employees.
 > 
 > Si detectan alguna otra discrepancia en el futuro, por favor indíquennos el colaborador y haremos la misma revisión de créditos y permisos.
 
-## Prevention / Product notes
+## Prevención / Notas de producto
 
-- When recording or importing vacation permissions, enforce validation so that no permission can be dated **before the employee's hire date**.
-- Ensure **all** vacation widgets use the same filtering rule on permissions (post-hire only) to avoid inconsistent balances.
-- Consider adding a help tooltip in the UI explaining:
-  - What "Días disponibles" represents.
-  - What "Días pendientes" in the annual summary represents.
+- Al registrar o importar permisos de vacaciones, se debe validar que ninguna fecha sea **anterior a la fecha de alta** del colaborador.
+- Todas las vistas/widgets de vacaciones deben usar la misma regla de filtrado de permisos (solo posteriores a la fecha de alta) para evitar saldos inconsistentes.
+- Puede ser útil agregar un tooltip o ayuda contextual en la UI que explique:
+  - Qué representa "Días disponibles".
+  - Qué representa "Días pendientes" en el resumen anual.
