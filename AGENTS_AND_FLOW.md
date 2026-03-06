@@ -296,7 +296,10 @@ El Orquestador Técnico decide cuándo un caso requiere involucrar explícitamen
 
 ## 6. Configuración de agentes (fichas)
 
-Esta sección resume la configuración operativa de cada agente: ID, rol, entradas/salidas y cuándo invocarlo. Se usa como referencia para crear los subagentes en OpenClaw.
+El detalle completo de la configuración operativa (ID, rol, inputs/outputs y criterios de invocación) vive en `support/AGENTS_CONFIG.md`.
+
+A continuación se incluye un resumen de alto nivel para contexto rápido; para configurar subagentes en OpenClaw, usar siempre `support/AGENTS_CONFIG.md` como fuente de verdad.
+
 
 ### 6.1. Orquestador Técnico
 
