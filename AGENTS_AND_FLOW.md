@@ -59,15 +59,28 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 ### 1.3. Agente Técnico – Tier 2 / Diagnóstico
 
-**Objetivo:** Analizar casos escalados, encontrar causa raíz y proponer soluciones.
+**Objetivo:** Analizar casos escalados, encontrar causa raíz y proponer soluciones a nivel full‑stack dentro de cada módulo.
 
-**Responsabilidades:**
+En la práctica no existe un solo "Agente Técnico", sino un **equipo de agentes técnicos especializados por dominio**, más un especialista transversal de datos:
+
+- Técnico Tiempos & Asistencia
+- Técnico Payroll
+- Técnico Frontend (personaapp)
+- Técnico BPM (solicitudes)
+- Técnico Organization (estructura org)
+- Técnico Persona
+- DB/Data Fix Specialist (Postgres/Mongo, transversal)
+
+Todos ellos comparten un mismo flujo base de trabajo:
+
+**Responsabilidades generales:**
 - Leer el paquete de escalación L1.
-- Revisar posibles artículos de KB relacionados (`kb/runbooks/`, `kb/troubleshooting/`).
+- Revisar artículos de KB relacionados (`kb/runbooks/`, `kb/troubleshooting/`).
 - Formular hipótesis técnicas: configuración, datos, lógica de negocio, bugs.
+- Consultar repositorios de código del módulo y las bases de datos (Postgres y Mongo por cliente) cuando haga falta.
 - Proponer correcciones:
-  - Pasos de resolución operativa (data-fix, ajustes de configuración).
-  - Cambios de producto (lógica de cálculo, validaciones, etc.).
+  - Pasos de resolución operativa (data‑fix, ajustes de configuración).
+  - Cambios de producto (lógica de cálculo, validaciones, UX).
 - Devolver:
   - Explicación en lenguaje entendible para L1/cliente.
   - Detalle técnico para ingeniería cuando haga falta.
@@ -80,6 +93,56 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 - Diagnóstico (causa raíz probable).
 - Plan de resolución (pasos concretos).
 - Recomendaciones de mejora de producto/validaciones.
+
+#### 1.3.1. Técnicos por módulo/dominio
+
+Cada Técnico de módulo es responsable de un conjunto de repositorios y lógica de negocio, con capacidad full‑stack dentro de su ámbito:
+
+- **Técnico Tiempos & Asistencia**
+  - Repositorio de tiempos y asistencia.
+  - Configuración de horarios, jornadas, reglas de cálculo, tolerancias e integraciones de marcaje.
+  - Problemas típicos: marcajes faltantes/duplicados, cálculo de horas extra/retardos, sincronización con payroll.
+  - Revisa datos y configuraciones en Postgres/Mongo por cliente, detecta registros corruptos o reglas mal seteadas y propone data‑fixes seguros.
+
+- **Técnico Payroll**
+  - Repo de payroll y reglas de cálculo de salarios, deducciones, prestaciones y liquidaciones.
+  - Interacciones con Tiempos & Asistencia, Persona y Organization.
+  - Diferencia entre errores de configuración y bugs de lógica de cálculo, proponiendo workarounds operativos y cambios de producto.
+
+- **Técnico Frontend (personaapp)**
+  - Repo de frontend/personaapp.
+  - Problemas de UI, permisos/visibilidad, manejo de estados e integración front‑backend.
+  - Valida contratos de APIs, payloads y mejora mensajes de error y validaciones en el front.
+
+- **Técnico BPM (solicitudes)**
+  - Repo de BPM/solicitudes.
+  - Flujos de aprobación, reglas de enrutamiento y estados de solicitudes.
+  - Detecta solicitudes atoradas o mal ruteadas, revisa definiciones de flujo y propone correcciones (data‑fix + ajustes de flujo).
+
+- **Técnico Organization (estructura org)**
+  - Repo de estructura organizacional.
+  - Jerarquías, centros de costo y unidades organizacionales.
+  - Valida consistencia referencial en DB y su impacto en permisos, reportes e integraciones.
+
+- **Técnico Persona**
+  - Repo de persona (datos maestros de colaboradores).
+  - Problemas de datos maestros que afectan a otros módulos (fechas de alta/baja, claves, documentos, etc.).
+  - Distingue entre errores de captura, reglas de negocio mal configuradas y bugs de integración.
+
+Cada Técnico trabaja para **todos los clientes** (Estratek, San Diego, Demo, Solvere, WuquKawoq, Panavisión, Cedilab, Agrocentro, Grupo Meme, Uniaceites, Semilla Nueva, Navinter, Autocraft, La Popular, Adicla, Innova, Grupo Rique, Yevo, Cuadra, IDM, etc.), adaptando sus análisis a la configuración y partición de datos de cada uno (schemas/DBs/colecciones por cliente).
+
+#### 1.3.2. DB/Data Fix Specialist (Postgres/Mongo)
+
+Agente transversal enfocado en correcciones de datos en **Postgres** y **MongoDB** (1 instancia por cliente):
+
+- Revisa y ejecuta scripts de corrección de datos con criterios de seguridad (backup, check, apply, verify).
+- Apoya a todos los Técnicos de módulo cuando:
+  - El fix cruza varios módulos (por ejemplo persona + payroll + tiempos y asistencia).
+  - Hay riesgos altos por cambios masivos o irreversibles.
+- Mantiene una librería versionada de scripts de data‑fix reutilizables, parametrizados por cliente.
+- Documenta en la KB los data‑fixes relevantes y sus riesgos/validaciones.
+
+El Orquestador Técnico decide cuándo un caso requiere involucrar explícitamente al DB/Data Fix Specialist.
 
 ---
 
