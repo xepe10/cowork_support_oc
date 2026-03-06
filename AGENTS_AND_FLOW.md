@@ -4,7 +4,30 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 ## 1. Roles de agentes
 
-### 1.1. Agente L1 – Frontline Support
+### 1.1. Orquestador (tú + asistente principal)
+
+**Objetivo:** Coordinar al equipo de agentes (L1, Técnico, Analista) y mantener la calidad de la base de conocimiento.
+
+**Responsabilidades del orquestador:**
+- Definir y ajustar el flujo de tickets y responsabilidades de cada agente.
+- Pedir al humano (tú) el know‑how cuando aparece un caso nuevo o complejo.
+- Convertir ese know‑how en artículos de KB en `kb/` (runbooks, troubleshooting, howto).
+- Decidir cuándo invocar subagentes L1/Técnico/Analista y cómo combinar sus respuestas.
+- Asegurar que las decisiones importantes (diseño, política de negocio) queden documentadas.
+- Mantener alineadas las convenciones de idioma, nombres de archivos y estructura de carpetas.
+
+**Entrada típica:**
+- Tickets reales o ejemplos.
+- Comentarios y audios tuyos explicando causas, cómo se soluciona, dónde revisar.
+
+**Salida típica:**
+- Artículos de KB actualizados.
+- Ajustes al flujo de trabajo (este archivo).
+- Instrucciones claras para L1/Técnico/Analista basadas en lo aprendido.
+
+---
+
+### 1.2. Agente L1 – Frontline Support
 
 **Objetivo:** Ser el primer punto de contacto con el cliente.
 
@@ -34,7 +57,7 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 ---
 
-### 1.2. Agente Técnico – Tier 2 / Diagnóstico
+### 1.3. Agente Técnico – Tier 2 / Diagnóstico
 
 **Objetivo:** Analizar casos escalados, encontrar causa raíz y proponer soluciones.
 
@@ -60,7 +83,7 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 ---
 
-### 1.3. Analista de Soportes – Support Analytics
+### 1.4. Analista de Soportes – Support Analytics
 
 **Objetivo:** Convertir los tickets y resoluciones en **insights** y **roadmap de mejora**.
 
@@ -94,9 +117,9 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 - `kb/README.md` – descripción general.
 - `kb/index.md` – índice y convenciones.
 - `kb/runbooks/` – procedimientos paso a paso para incidentes conocidos.
-  - Ejemplo: `payroll_liquidation_annulled_substitution_patronal.md`
+  - Ejemplo: `liquidacion_sustitucion_patronal_anulada.md`.
 - `kb/troubleshooting/` – árboles de diagnóstico y análisis de casos específicos.
-  - Ejemplo: `vacations_diff_available_vs_pending.md`
+  - Ejemplo: `diferencia_dias_vacaciones_disponibles_pendientes.md`.
 - `kb/howto/` – guías "cómo hacer X" para uso/configuración.
 - `kb/reference/` – definiciones, modelos de datos, contratos de API, etc.
 
@@ -104,11 +127,11 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 - `support_analytics/README.md` – propósito y formato.
 - `support_analytics/snapshots/` – informes periódicos del analista.
-  - Ejemplo: `2026-03_support_review.md`
+  - Ejemplo: `2026-03_support_review.md`.
 - `support_analytics/roadmap/` – backlog de mejoras derivadas de soporte.
-  - Ejemplo: `2026-03_improvement_backlog.md`
+  - Ejemplo: `2026-03_improvement_backlog.md`.
 
-> Nota: KB y analytics deben versionarse en git para que persistan entre despliegues (Railway, etc.).
+> Nota: KB y analytics deben versionarse en git para que persistan entre despliegues (Railway, etc.). Este repositorio (`cowork_support_oc`) está pensado **solo** para documentación de soporte: agentes, KB y analytics.
 
 ---
 
@@ -132,7 +155,7 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 - **Si KB resuelve el caso:**
   - L1 responde al cliente con base en el artículo.
-  - Si el artículo se quedó corto o hubo matiz nuevo, L1 anota mejora pendiente para KB.
+  - Si el artículo se quedó corto o hubo matiz nuevo, L1 anota mejora pendiente para KB y el orquestador la actualiza.
 
 - **Si requiere análisis técnico:**
   - L1 arma bloque de escalación con:
@@ -148,12 +171,12 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 1. Técnico revisa escalación + KB.
 2. Si encuentra que el problema ya está documentado:
-   - Actualiza runbook/troubleshooting si hace falta.
+   - Actualiza runbook/troubleshooting si hace falta (o deja notas para que el orquestador actualice el artículo).
    - Devuelve resolución a L1.
 3. Si es nuevo:
    - Hace diagnóstico (código, configuración, datos, integraciones).
    - Propone solución operativa + cambios de producto.
-   - Documenta el caso como **nuevo artículo de KB** (o deja notas para que el orquestador lo documente).
+   - Trabaja con el orquestador para documentar el caso como **nuevo artículo de KB**.
 4. Devuelve a L1:
    - Explicación resumida para cliente.
    - Detalles técnicos para ingeniería (si aplica).
@@ -182,16 +205,35 @@ Este documento define la estructura del "equipo" de agentes de IA para soporte t
 
 ## 4. Persistencia y despliegue
 
-- Todo lo anterior vive en el árbol de archivos del proyecto (`/data/workspace` en el contenedor). 
-- Para que **no se pierda** en Railway u otros despliegues:
-  - Asegúrate de que `kb/`, `support_analytics/` y `support/AGENTS_AND_FLOW.md` formen parte del repositorio.
+- Todo lo anterior vive en el árbol de archivos del proyecto, en este repo de documentación (`support/` en el servidor y `cowork_support_oc` en GitHub).
+- Para que **no se pierda**:
+  - Asegúrate de que `kb/`, `support_analytics/` y `AGENTS_AND_FLOW.md` formen parte del repositorio.
   - Hacer `git add`, `git commit` y `git push` después de cambios importantes.
-- Los subagentes como tales son efímeros; lo importante es lo que está en este documento y en la KB, que permite recrear su comportamiento.
+- Los subagentes como tales son efímeros; lo importante es lo que está en este documento y en la KB, que permite recrear su comportamiento (prompts y flujo).
 
 ---
 
-## 5. Próximos pasos sugeridos
+## 5. Convenciones y configuración
+
+- **Idioma:**
+  - Todo el contenido de la KB y de este repo se documenta en **español**, salvo términos técnicos muy específicos.
+  - Los nombres de archivos usan snake_case en español (sin espacios), por ejemplo:
+    - `liquidacion_sustitucion_patronal_anulada.md`.
+    - `diferencia_dias_vacaciones_disponibles_pendientes.md`.
+- **Ámbito del repo `cowork_support_oc`:**
+  - Solo documentación de soporte: agentes, KB, analytics.
+  - No se incluyen entornos virtuales, código de producto ni archivos de OpenClaw/Google.
+- **Rol del orquestador:**
+  - Yo (asistente principal) actúo como orquestador, trabajando contigo:
+    - Te consulto en casos nuevos para entender causa raíz y solución.
+    - Transformo esa información en artículos de KB y en ajustes a este documento.
+    - Coordino el uso de subagentes L1/Técnico/Analista cuando haga falta.
+
+---
+
+## 6. Próximos pasos sugeridos
 
 1. Revisar y, si es necesario, ajustar la taxonomía de módulos (Vacaciones, Nómina, Sustitución patronal, etc.) y documentarla en `kb/reference/`.
 2. Crear el primer snapshot analítico en `support_analytics/snapshots/` usando el caso de vacaciones y sustitución patronal como punto de partida.
 3. Definir un pequeño checklist para L1 (plantilla) usando la información de este archivo.
+4. Cada vez que aparezca un soporte nuevo relevante, documentarlo en `kb/` siguiendo estas convenciones y actualizar este archivo si cambia el flujo.
