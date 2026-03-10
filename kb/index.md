@@ -4,6 +4,7 @@
 
 - **Runbooks** (`kb/runbooks/`)
   - Procedimientos paso a paso para incidentes conocidos.
+  - ✅ [EPC → BioStar missing employee sync](runbooks/biostar_missing_employee_sync.md)
 - **How-to Guides** (`kb/howto/`)
   - Instrucciones para configurar o usar funcionalidades.
 - **Troubleshooting Trees** (`kb/troubleshooting/`)
