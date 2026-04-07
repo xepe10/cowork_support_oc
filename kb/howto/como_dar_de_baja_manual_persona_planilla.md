@@ -108,22 +108,43 @@ En MongoDB, asegurarse de cumplir las condiciones de baja.
    - Desactivarla y setear `fecha_fin` = fecha de baja.
 
 3. **En `registrotrayectoria`**
-   - Ubicar el registro de trayectoria de la última silla.
-   - Actualizar `fecha_fin` al valor de fecha de baja.
+   - Ubicar el registro de trayectoria de la última silla (filtrar por id de silla).
+   - Actualizar la columna `fechafin` con la **fecha de baja**.
 
 4. **En `baja`**
-   - Verificar si existe un registro de baja asociado a esa persona y silla:
-     - Si no existe, crear un registro de baja con:
-       - referencia a la persona,
-       - referencia a la silla,
-       - fecha de baja.
+   - Verificar si existe un registro de baja asociado a esa persona y silla.
+   - Si NO existe, insertar un nuevo registro con, al menos, estos campos:
+     - `__v`: 0
+     - `Comentario`: comentario si aplica (opcional)
+     - `createdAt`: fecha de actualización de la liquidación
+     - `Deleted`: `false`
+     - `Fechasalida`: fecha de baja
+     - `Logestadopersona`: `[]` (lista vacía, se llenará con el log de estado)
+     - `Motivo`: id del motivo de baja
+     - `Pendiente`: `false`
+     - `Persona`: id de la tabla `persona`
+     - `Silla`: id de la tabla `silla`
+     - `UpdatedAt`: fecha actual
+     - `Recontratacion`: `false`
 
 5. **En `logestadopersona`**
-   - Insertar un nuevo log con:
-     - estado = `"debaja"`,
-     - referencia al registro de baja creado,
-     - fecha/hora de la operación,
-     - usuario que ejecuta el cambio.
+   - Insertar un nuevo registro de log con, al menos:
+     - `__v`: 0
+     - `Alta`: "" (vacío)
+     - `Comentario`: motivo de despido / baja
+     - `CreatedAt`: fecha de finalización de la liquidación
+     - `Deleted`: `false`
+     - `Estado`: `debaja`
+     - `Fecha`: **fecha de la baja**
+     - `Isused`: `false`
+     - `Persona`: id de la persona
+     - `UpdatedAt`: fecha actual
+     - `Dia`: día de la baja creada
+     - `Codigoempresa`: id de la empresa del colaborador
+     - `Motivo`: id del motivo de despido
+     - `Pendiente`: `false`
+     - `Silla`: id de la silla
+     - `Baja`: id de la baja creada
 
 > Al terminar este paso, en Mongo Persona la persona debería aparecer como de baja y los historiales de silla/trayectoria/baja/log coherentes entre sí.
 
